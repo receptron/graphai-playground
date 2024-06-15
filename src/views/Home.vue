@@ -97,12 +97,12 @@
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
         ErrorLog
-        <div>{{ errorLog }}</div>
+        <div class=" break-words">{{ errorLog }}</div>
       </div>
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
         GraphLog
-        <div v-for="(log, key) in graphLog" :key="key" class="text-left">
+        <div v-for="(log, key) in graphLog" :key="key" class="text-left  break-words">
           {{ log }}
         </div>
       </div>
