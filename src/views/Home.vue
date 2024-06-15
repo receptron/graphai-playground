@@ -5,12 +5,15 @@
         <div class="flex">
           <div class="w-8/12">
             <!-- textarea -->
+            <v-ace-editor class="h-1/2" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
+            <!--
             <textarea
               v-model="graphText"
               :rows="graphText.split('\n').length + 5"
               class="p-2 w-full rounded-md border-2 resize-y focus:outline-none"
               :class="isValudGraph ? '' : 'border-red-500'"
-            />
+              />
+            -->
           </div>
           <div class="w-4/12 text-left p-2">
             <div>
@@ -114,6 +117,15 @@ import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from 
 
 import YAML from "yaml";
 
+import { VAceEditor } from "vue3-ace-editor";
+
+import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
+import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
+import { config } from "ace-builds";
+
+config.setModuleUrl("ace/mode/yaml", modeYaml);
+config.setModuleUrl("ace/theme/chrome", chromeTheme);
+
 // const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
 
 const useAgentFilter = (serverAgentIds: string[], streamAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
@@ -174,8 +186,14 @@ export default defineComponent({
   name: "HomePage",
   components: {
     TextAreaView,
+    VAceEditor,
   },
   setup() {
+    const editor = ref<Ace.Editor>();
+    const editorInit = (e: Ace.Editor) => {
+      editor.value = e;
+    };
+
     const { graphText, graphData, isValudGraph, nodes, addAgent } = useGraphInput();
 
     const selectedGraphIndex = ref(0);
@@ -209,11 +227,15 @@ export default defineComponent({
     });
     const streamAgentIds = computed(() => {
       return [
-        ...Object.values(serverAgentsInfoDictionary.value).filter(a => a.stream).map(a => a.agentId),
-        ...Object.values(webAgents).filter(a => a.stream).map(a => a.name)
-      ]
+        ...Object.values(serverAgentsInfoDictionary.value)
+          .filter((a) => a.stream)
+          .map((a) => a.agentId),
+        ...Object.values(webAgents)
+          .filter((a) => a.stream)
+          .map((a) => a.name),
+      ];
     });
-    
+
     const callback = (context: AgentFunctionContext, data: string) => {
       const { nodeId } = context.debugInfo;
       streamingData.value[nodeId] = (streamingData.value[nodeId] ?? "") + data;
@@ -248,6 +270,7 @@ export default defineComponent({
 
     const load = () => {
       graphText.value = YAML.stringify({ ...selectedGraph.value }, null, 2);
+      // editor.value.getSession().setValue(graphText.value);
     };
     const loadLocal = () => {
       graphText.value = loadLocalStorage(selectedLocalName.value) ?? "";
@@ -299,6 +322,8 @@ export default defineComponent({
       loadLocal,
 
       cytoscapeRef,
+
+      editorInit,
     };
   },
 });
