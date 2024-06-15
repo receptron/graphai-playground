@@ -96,7 +96,15 @@
       </div>
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
-        <TextAreaView :data-object="errorLog" />
+        ErrorLog
+        <div>{{ errorLog }}</div>
+      </div>
+
+      <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
+        GraphLog
+        <div v-for="(log, key) in graphLog" :key="key" class="text-left">
+          {{ log }}
+        </div>
       </div>
     </div>
   </div>
@@ -139,7 +147,6 @@ export default defineComponent({
     };
 
     const { graphText, graphData, isValudGraph, nodes, addAgent } = useGraphInput();
-
     const { selectedGraphIndex, selectedGraph, graphDataSet } = useSelectGraph();
 
     const currentName = ref("");
@@ -170,6 +177,8 @@ export default defineComponent({
     const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
     const { streamingData, callback } = useStreamingData();
 
+    const errorLog = ref("");
+    const graphLog = ref<string[]>([]);
     const runGraph = async () => {
       const httpAgentUrl = "http://localhost:8085/agents";
       const agentFilters = getAgentFilter(httpAgentUrl, serverAgentIds.value, streamAgentIds.value, callback);
@@ -179,12 +188,20 @@ export default defineComponent({
       result.value = {};
       streamingData.value = {};
 
-      const graphai = new GraphAI(graphData.value, { ...webAgents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds.value });
-      graphai.onLogCallback = (log) => {
-        const isServer = serverAgentIds.value.includes(log.agentId);
-        updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
-      };
-      result.value = await graphai.run();
+      try {
+        const graphai = new GraphAI(graphData.value, { ...webAgents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds.value });
+        graphai.onLogCallback = (log) => {
+          const { agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage } = log;
+
+          graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
+          //console.log(log)
+          const isServer = serverAgentIds.value.includes(log.agentId);
+          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
+        };
+        result.value = await graphai.run();
+      } catch (e) {
+        errorLog.value = e;
+      }
     };
 
     const save = () => {
@@ -248,6 +265,9 @@ export default defineComponent({
       localStorageList,
       selectedLocalGraphIndex,
       loadLocal,
+
+      errorLog,
+      graphLog,
 
       cytoscapeRef,
 
