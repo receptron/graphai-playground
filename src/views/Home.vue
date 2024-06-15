@@ -90,6 +90,7 @@ import { defineComponent, ref, computed } from "vue";
 import { GraphAI, AgentFunctionContext } from "graphai";
 
 import * as agents from "@graphai/vanilla";
+
 import { sleeperAgent } from "@graphai/sleeper_agents";
 import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
 
@@ -97,9 +98,11 @@ import { graphDataSet } from "@/utils/graph_data";
 
 import { useCytoscape } from "@receptron/graphai_vue_cytoscape";
 
-import TextAreaView from "../components/TextAreaView.vue";
+import TextAreaView from "@/components/TextAreaView.vue";
 
 import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./localStorage";
+
+import YAML from "yaml";
 
 const serverAgentIds = ["groqAgent", "slashGPTAgent", "openAIAgent", "fetchAgent", "wikipediaAgent"];
 const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
@@ -131,7 +134,7 @@ const useGraphInput = () => {
   const graphText = ref("");
   const graphData = computed(() => {
     try {
-      return JSON.parse(graphText.value);
+      return YAML.parse(graphText.value);
     } catch (e) {
       return null;
     }
@@ -148,9 +151,14 @@ const useGraphInput = () => {
       agent: agentId,
       inputs: [],
     };
-    graphText.value = JSON.stringify(tmp, null, 2);
+    graphText.value = YAML.stringify(tmp, null, 2);
   };
   return { graphText, graphData, isValudGraph, nodes, addAgent };
+};
+
+const getServerAgents = async () => {
+  const response = await fetch("http://localhost:8085/agents/list");
+  return await response.json();
 };
 
 export default defineComponent({
@@ -175,6 +183,11 @@ export default defineComponent({
 
     const streamingData = ref<Record<string, unknown>>({});
     const result = ref<unknown>({});
+
+    (async () => {
+      const res = await getServerAgents();
+      console.log(res);
+    })();
 
     const callback = (context: AgentFunctionContext, data: string) => {
       const { nodeId } = context.debugInfo;
@@ -209,7 +222,7 @@ export default defineComponent({
     };
 
     const load = () => {
-      graphText.value = JSON.stringify({ ...selectedGraph.value }, null, 2);
+      graphText.value = YAML.stringify({ ...selectedGraph.value }, null, 2);
     };
     const loadLocal = () => {
       graphText.value = loadLocalStorage(selectedLocalName.value) ?? "";

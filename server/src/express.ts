@@ -2,7 +2,9 @@ import "dotenv/config";
 
 import express from "express";
 import cors from "cors";
-import * as agents from "@graphai/agents";
+import * as llmAgents from "@graphai/llm_agents";
+import * as serviceAgents from "@graphai/service_agents";
+import * as localAgent from "./agents";
 
 import { agentDispatcher, agentsList, agentDoc } from "@receptron/graphai_express";
 
@@ -24,6 +26,8 @@ app.use(
 );
 app.use(cors(options));
 
+
+const agents = {...llmAgents, ...serviceAgents, ...localAgent};
 
 app.get("/agents/list", agentsList(agents, "http://localhost:8085", "/agents"));
 app.get("/agents/:agentId", agentDoc(agents, "http://localhost:8085", "/agents"));
