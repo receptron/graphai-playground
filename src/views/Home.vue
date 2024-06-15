@@ -3,15 +3,17 @@
     <div>
       <div class="w-10/12 mx-auto rounded-md mt-4">
         <div class="flex">
-          <div class="w-8/12">
+          <div class="w-8/12 border-2"
+               :class="isValudGraph ? '' : 'border-red-500'"
+               >
             <!-- textarea -->
-            <v-ace-editor class="h-1/2" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
+            <v-ace-editor class="h-full" v-model:value="graphText"
+                          lang="yaml" theme="chrome" @init="editorInit" />
             <!--
             <textarea
               v-model="graphText"
               :rows="graphText.split('\n').length + 5"
               class="p-2 w-full rounded-md border-2 resize-y focus:outline-none"
-              :class="isValudGraph ? '' : 'border-red-500'"
               />
             -->
           </div>
