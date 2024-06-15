@@ -34,6 +34,18 @@
             <div>
               <button @click="save" class="border-2 rounded-md m-2 p-2">save</button>
             </div>
+            <div>
+              <b>Nodes:</b>
+              <div v-for="(nodeId, key) in Object.keys(nodes)" :key="key">
+                {{ nodeId }}
+              </div>
+            </div>
+            <div>
+              <b>Agents:</b>
+              <div v-for="(agent, key) in agentKeys" :key="key" @click="addAgentToGraph(agent)" class="cursor-pointer">
+                {{ agent }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -127,7 +139,18 @@ const useGraphInput = () => {
   const isValudGraph = computed(() => {
     return graphData.value !== null;
   });
-  return { graphText, graphData, isValudGraph };
+  const nodes = computed(() => {
+    return graphData.value?.nodes || {};
+  });
+  const addAgent = (agentId: string, nodeId: string) => {
+    const tmp = { ...graphData.value };
+    tmp.nodes[nodeId] = {
+      agent: agentId,
+      inputs: [],
+    };
+    graphText.value = JSON.stringify(tmp, null, 2);
+  };
+  return { graphText, graphData, isValudGraph, nodes, addAgent };
 };
 
 export default defineComponent({
@@ -136,7 +159,7 @@ export default defineComponent({
     TextAreaView,
   },
   setup() {
-    const { graphText, graphData, isValudGraph } = useGraphInput();
+    const { graphText, graphData, isValudGraph, nodes, addAgent } = useGraphInput();
 
     const selectedGraphIndex = ref(0);
     const selectedGraph = computed(() => {
@@ -193,6 +216,17 @@ export default defineComponent({
       currentName.value = selectedLocalName.value;
     };
 
+    const agentKeys = computed(() => {
+      return [...serverAgentIds, ...Object.keys(agents)];
+    });
+    const addAgentToGraph = (agentId: string) => {
+      if (isValudGraph.value) {
+        console.log(agentId);
+        const nodeId = prompt("NodeId");
+        addAgent(agentId, nodeId);
+      }
+    };
+
     return {
       agentServer,
       runGraph,
@@ -205,6 +239,10 @@ export default defineComponent({
 
       graphText,
       load,
+
+      nodes,
+      agentKeys,
+      addAgentToGraph,
 
       isValudGraph,
 
