@@ -1,6 +1,8 @@
 import { ref, computed } from "vue";
 import YAML from "yaml";
 
+import { AgentFunctionContext } from "graphai";
+
 import { graphDataSet } from "@/utils/graph_data";
 import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
 
@@ -38,7 +40,7 @@ export const useGraphInput = () => {
   return { graphText, graphData, isValudGraph, nodes, addAgent };
 };
 
-export const getAgentFilter = (
+export const getAgentFilter = <T>(
   httpAgentUrl: string,
   serverAgentIds: string[],
   streamAgentIds: string[],
@@ -65,24 +67,30 @@ export const getAgentFilter = (
   return agentFilters;
 };
 
+type serverAgentInfo = Record<string, string | number>;
+
 export const useServerAgent = (listUrl: string) => {
   const getServerAgents = async () => {
     const response = await fetch(listUrl);
     return await response.json();
   };
 
-  const serverAgentsInfoDictionary = ref({});
+  const serverAgentsInfoDictionary = ref<Record<string, serverAgentInfo>>({});
 
   (async () => {
     const res = await getServerAgents();
-    serverAgentsInfoDictionary.value = res.agents.reduce((tmp, a) => {
+    serverAgentsInfoDictionary.value = res.agents.reduce((tmp: Record<string, serverAgentInfo>, a: serverAgentInfo) => {
       tmp[a.agentId] = a;
       return tmp;
     }, {});
   })();
 
   const serverAgentIds = computed(() => {
-    return Object.values(serverAgentsInfoDictionary.value).map((a) => a.agentId) ?? [];
+    return (
+      Object.keys(serverAgentsInfoDictionary.value).map((key: string) => {
+        return serverAgentsInfoDictionary.value[key].agentId;
+      }) ?? []
+    );
   });
   return { serverAgentsInfoDictionary, serverAgentIds };
 };

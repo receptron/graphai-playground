@@ -113,7 +113,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 
-import { GraphAI, AgentFunctionContext } from "graphai";
+import { GraphAI } from "graphai";
 
 import * as webAgents from "@graphai/vanilla";
 import { sleeperAgent } from "@graphai/sleeper_agents";
