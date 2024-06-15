@@ -4,9 +4,7 @@ const localStorageListKey = localStoragePrefix + "-list";
 export const loadLocalStorageList = () => {
   try {
     const listString = localStorage.getItem(localStorageListKey) ?? "[]";
-    console.log(listString);
     const listData = JSON.parse(listString);
-    console.log(listData);
     return listData;
   } catch (e) {
     console.log(e);
@@ -25,12 +23,10 @@ export const saveGraphToLocalStorage = (graphText: string, currentName: string) 
   localStorage.setItem(graphKey, graphText);
 
   return name;
-  // console.log(hoge);
 };
 
 export const loadLocalStorage = (name: string) => {
   const graphKey = localStoragePrefix + "-graph-" + name;
-  console.log(graphKey);
   const graphString = localStorage.getItem(graphKey);
   return graphString;
 };

@@ -3,12 +3,9 @@
     <div>
       <div class="w-10/12 mx-auto rounded-md mt-4">
         <div class="flex">
-          <div class="w-8/12 border-2"
-               :class="isValudGraph ? '' : 'border-red-500'"
-               >
+          <div class="w-8/12 border-2" :class="isValudGraph ? '' : 'border-red-500'">
             <!-- textarea -->
-            <v-ace-editor class="h-full" v-model:value="graphText"
-                          lang="yaml" theme="chrome" @init="editorInit" />
+            <v-ace-editor class="h-full" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
             <!--
             <textarea
               v-model="graphText"
@@ -76,7 +73,6 @@
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
         <div class="h-full">
-
           <!-- cytoscape -->
           <div>
             <div class="h-60 bg-white align-top m-2">
@@ -98,6 +94,10 @@
           </div>
         </div>
       </div>
+
+      <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
+        <TextAreaView :data-object="errorLog" />
+      </div>
     </div>
   </div>
 </template>
@@ -108,82 +108,23 @@ import { defineComponent, ref, computed } from "vue";
 import { GraphAI, AgentFunctionContext } from "graphai";
 
 import * as webAgents from "@graphai/vanilla";
-
 import { sleeperAgent } from "@graphai/sleeper_agents";
-import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
-
-import { graphDataSet } from "@/utils/graph_data";
-
 import { useCytoscape } from "@receptron/graphai_vue_cytoscape";
 
 import TextAreaView from "@/components/TextAreaView.vue";
 
-import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./localStorage";
+import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./home/localStorage";
+import { useSelectGraph, useGraphInput, getAgentFilter, useServerAgent, useStreamingData } from "./home/utils";
 
 import YAML from "yaml";
 
 import { VAceEditor } from "vue3-ace-editor";
-
 import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
 import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
 import { config } from "ace-builds";
 
 config.setModuleUrl("ace/mode/yaml", modeYaml);
 config.setModuleUrl("ace/theme/chrome", chromeTheme);
-
-const useAgentFilter = (serverAgentIds: string[], streamAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
-  const streamAgentFilter = streamAgentFilterGenerator(callback);
-  console.log(streamAgentFilter);
-  const agentFilters = [
-    {
-      name: "streamAgentFilter",
-      agent: streamAgentFilter,
-      agentIds: serverAgentIds,
-    },
-    {
-      name: "httpAgentFilter",
-      agent: httpAgentFilter,
-      filterParams: {
-        server: {
-          baseUrl: "http://localhost:8085/agents",
-        },
-      },
-      agentIds: serverAgentIds,
-    },
-  ];
-  return agentFilters;
-};
-
-const useGraphInput = () => {
-  const graphText = ref("");
-  const graphData = computed(() => {
-    try {
-      return YAML.parse(graphText.value);
-    } catch (e) {
-      return null;
-    }
-  });
-  const isValudGraph = computed(() => {
-    return graphData.value !== null;
-  });
-  const nodes = computed(() => {
-    return graphData.value?.nodes || {};
-  });
-  const addAgent = (agentId: string, nodeId: string) => {
-    const tmp = { ...graphData.value };
-    tmp.nodes[nodeId] = {
-      agent: agentId,
-      inputs: [],
-    };
-    graphText.value = YAML.stringify(tmp, null, 2);
-  };
-  return { graphText, graphData, isValudGraph, nodes, addAgent };
-};
-
-const getServerAgents = async () => {
-  const response = await fetch("http://localhost:8085/agents/list");
-  return await response.json();
-};
 
 export default defineComponent({
   name: "HomePage",
@@ -199,10 +140,7 @@ export default defineComponent({
 
     const { graphText, graphData, isValudGraph, nodes, addAgent } = useGraphInput();
 
-    const selectedGraphIndex = ref(0);
-    const selectedGraph = computed(() => {
-      return graphDataSet[selectedGraphIndex.value].data;
-    });
+    const { selectedGraphIndex, selectedGraph, graphDataSet } = useSelectGraph();
 
     const currentName = ref("");
     const selectedLocalGraphIndex = ref(0);
@@ -211,20 +149,10 @@ export default defineComponent({
       return localStorageList.value[selectedLocalGraphIndex.value];
     });
 
-    const streamingData = ref<Record<string, unknown>>({});
     const result = ref<unknown>({});
 
-    const serverAgentsInfoDictionary = ref({});
-    (async () => {
-      const res = await getServerAgents();
-      serverAgentsInfoDictionary.value = res.agents.reduce((tmp, a) => {
-        tmp[a.agentId] = a;
-        return tmp;
-      }, {});
-    })();
-    const serverAgentIds = computed(() => {
-      return Object.values(serverAgentsInfoDictionary.value).map((a) => a.agentId) ?? [];
-    });
+    const { serverAgentsInfoDictionary, serverAgentIds } = useServerAgent("http://localhost:8085/agents/list");
+
     const webAgentIds = computed(() => {
       return Object.keys(webAgents);
     });
@@ -239,15 +167,12 @@ export default defineComponent({
       ];
     });
 
-    const callback = (context: AgentFunctionContext, data: string) => {
-      const { nodeId } = context.debugInfo;
-      streamingData.value[nodeId] = (streamingData.value[nodeId] ?? "") + data;
-    };
-
     const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
+    const { streamingData, callback } = useStreamingData();
 
     const runGraph = async () => {
-      const agentFilters = useAgentFilter(serverAgentIds.value, streamAgentIds.value, callback);
+      const httpAgentUrl = "http://localhost:8085/agents";
+      const agentFilters = getAgentFilter(httpAgentUrl, serverAgentIds.value, streamAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
       }
