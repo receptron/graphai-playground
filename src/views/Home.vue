@@ -41,9 +41,19 @@
               </div>
             </div>
             <div>
-              <b>Agents:</b>
-              <div v-for="(agent, key) in agentKeys" :key="key" @click="addAgentToGraph(agent)" class="cursor-pointer">
-                {{ agent }}
+              <b>ServerAgents:</b>
+              <div v-for="(agent, key) in serverAgentIds" :key="key" @click="addAgentToGraph(agent)">
+                <span @click="addAgentToGraph(agent)" class="cursor-pointer">
+                  {{ agent }}
+                </span>
+                <span @click="infoServerAgent(agent)" class="cursor-pointer"> (i) </span>
+              </div>
+              <b>WebAgents:</b>
+              <div v-for="(agent, key) in webAgentIds" :key="key">
+                <span @click="addAgentToGraph(agent)" class="cursor-pointer">
+                  {{ agent }}
+                </span>
+                <span @click="infoWebAgent(agent)" class="cursor-pointer"> (i) </span>
               </div>
             </div>
           </div>
@@ -89,7 +99,7 @@ import { defineComponent, ref, computed } from "vue";
 
 import { GraphAI, AgentFunctionContext } from "graphai";
 
-import * as agents from "@graphai/vanilla";
+import * as webAgents from "@graphai/vanilla";
 
 import { sleeperAgent } from "@graphai/sleeper_agents";
 import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
@@ -104,10 +114,11 @@ import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from 
 
 import YAML from "yaml";
 
-const serverAgentIds = ["groqAgent", "slashGPTAgent", "openAIAgent", "fetchAgent", "wikipediaAgent"];
+//const serverAgentIds = ["groqAgent", "slashGPTAgent", "openAIAgent", "fetchAgent", "wikipediaAgent"];
 const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
 
-const useAgentFilter = (callback: (context: AgentFunctionContext, data: T) => void) => {
+const useAgentFilter = (serverAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
+  console.log(serverAgentIds);
   const streamAgentFilter = streamAgentFilterGenerator(callback);
 
   const agentFilters = [
@@ -184,29 +195,38 @@ export default defineComponent({
     const streamingData = ref<Record<string, unknown>>({});
     const result = ref<unknown>({});
 
+    const serverAgentsInfoDictionary = ref({});
     (async () => {
       const res = await getServerAgents();
-      console.log(res);
+      serverAgentsInfoDictionary.value = res.agents.reduce((tmp, a) => {
+        tmp[a.agentId] = a;
+        return tmp;
+      }, {});
+      console.log(res.agents);
     })();
+    const serverAgentIds = computed(() => {
+      return Object.values(serverAgentsInfoDictionary.value).map((a) => a.agentId) ?? [];
+      //return Object.keys(serverAgentsInfoDictionary.value) || [];
+    });
 
     const callback = (context: AgentFunctionContext, data: string) => {
       const { nodeId } = context.debugInfo;
       streamingData.value[nodeId] = (streamingData.value[nodeId] ?? "") + data;
     };
-    const agentFilters = useAgentFilter(callback);
 
     const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
 
     const runGraph = async () => {
+      const agentFilters = useAgentFilter(serverAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
       }
       result.value = {};
       streamingData.value = {};
 
-      const graphai = new GraphAI(graphData.value, { ...agents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds });
+      const graphai = new GraphAI(graphData.value, { ...webAgents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds.value });
       graphai.onLogCallback = (log) => {
-        const isServer = serverAgentIds.includes(log.agentId);
+        const isServer = serverAgentIds.value.includes(log.agentId);
         updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
       };
       result.value = await graphai.run();
@@ -229,17 +249,24 @@ export default defineComponent({
       currentName.value = selectedLocalName.value;
     };
 
-    const agentKeys = computed(() => {
-      return [...serverAgentIds, ...Object.keys(agents)];
+    const webAgentIds = computed(() => {
+      return Object.keys(webAgents);
     });
     const addAgentToGraph = (agentId: string) => {
       if (isValudGraph.value) {
-        console.log(agentId);
         const nodeId = prompt("NodeId");
-        addAgent(agentId, nodeId);
+        if (nodeId) {
+          addAgent(agentId, nodeId);
+        }
       }
     };
-
+    const infoWebAgent = (agentId: string) => {
+      console.log(webAgents[agentId]);
+    };
+    const infoServerAgent = (agentId: string) => {
+      console.log(serverAgentsInfoDictionary.value);
+      console.log(serverAgentsInfoDictionary.value[agentId]);
+    };
     return {
       agentServer,
       runGraph,
@@ -254,8 +281,12 @@ export default defineComponent({
       load,
 
       nodes,
-      agentKeys,
       addAgentToGraph,
+      infoWebAgent,
+      infoServerAgent,
+
+      webAgentIds,
+      serverAgentIds,
 
       isValudGraph,
 

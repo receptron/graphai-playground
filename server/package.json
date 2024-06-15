@@ -14,7 +14,7 @@
   "dependencies": {
     "@graphai/llm_agents": "^0.0.6",
     "@graphai/service_agents": "^0.0.4",
-    "@receptron/graphai_express": "^0.0.20",
+    "@receptron/graphai_express": "^0.0.21",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   },

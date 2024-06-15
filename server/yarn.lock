@@ -174,10 +174,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@receptron/graphai_express@^0.0.20":
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/@receptron/graphai_express/-/graphai_express-0.0.20.tgz#598ca3d26c01a463f6f79d35683a6242a110a777"
-  integrity sha512-HHpmShFa6fdU3/aHbsLyGYPzUTlKvdT1wfC4Wh6bv5uruwZNgI+uT0vy53svTfBo6boCTXQeshnNasK7Qj6MTg==
+"@receptron/graphai_express@^0.0.21":
+  version "0.0.21"
+  resolved "https://registry.yarnpkg.com/@receptron/graphai_express/-/graphai_express-0.0.21.tgz#b95843a0392145cfe5da01e0cd583506fe4cb08a"
+  integrity sha512-d1YFPb3SDHFSRXxDczqKwUwpUW48/oOomUjP3VQALgePSSdIoQeOjZxyBWtU0O00lHpKYp7Ivw6qwF0bzN1JKA==
   dependencies:
     "@graphai/agent_filters" "^0.0.5"
     dotenv "^16.4.5"
