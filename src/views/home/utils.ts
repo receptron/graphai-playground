@@ -49,7 +49,7 @@ export const getAgentFilter = (
     {
       name: "streamAgentFilter",
       agent: streamAgentFilter,
-      agentIds: serverAgentIds,
+      agentIds: streamAgentIds,
     },
     {
       name: "httpAgentFilter",
