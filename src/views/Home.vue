@@ -47,7 +47,7 @@
             </div>
             <div>
               <b>ServerAgents:</b>
-              <div v-for="(agent, key) in serverAgentIds" :key="key" @click="addAgentToGraph(agent)">
+              <div v-for="(agent, key) in serverAgentIds" :key="key">
                 <span @click="addAgentToGraph(agent)" class="cursor-pointer">
                   {{ agent }}
                 </span>
@@ -66,13 +66,16 @@
       </div>
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
-        <div class="h-full">
-          <div class="p-2">
-            <!-- run button -->
-            <div>
-              <button class="text-white font-bold items-center rounded-full px-4 py-2 m-1 bg-sky-500 hover:bg-sky-700" @click="agentServer">Run</button>
-            </div>
+        <div class="p-2">
+          <!-- run button -->
+          <div>
+            <button class="w-60 text-white font-bold items-center rounded-full px-4 py-2 m-1 bg-sky-500 hover:bg-sky-700" @click="agentServer">Run</button>
           </div>
+        </div>
+      </div>
+
+      <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
+        <div class="h-full">
 
           <!-- cytoscape -->
           <div>
@@ -128,8 +131,6 @@ import { config } from "ace-builds";
 config.setModuleUrl("ace/mode/yaml", modeYaml);
 config.setModuleUrl("ace/theme/chrome", chromeTheme);
 
-// const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
-
 const useAgentFilter = (serverAgentIds: string[], streamAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
   const streamAgentFilter = streamAgentFilterGenerator(callback);
   console.log(streamAgentFilter);
@@ -137,7 +138,7 @@ const useAgentFilter = (serverAgentIds: string[], streamAgentIds: string[], call
     {
       name: "streamAgentFilter",
       agent: streamAgentFilter,
-      agentIds: streamAgents,
+      agentIds: serverAgentIds,
     },
     {
       name: "httpAgentFilter",
