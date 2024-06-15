@@ -196,10 +196,10 @@
   dependencies:
     deepmerge "^4.3.1"
 
-"@graphai/vanilla@^0.0.3":
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/@graphai/vanilla/-/vanilla-0.0.3.tgz#c09449bfc96f54fd8c6b8809cb66c73dc1bbf199"
-  integrity sha512-lYimwhvoq1ULlQoVR7rocY3pqMt6qN6kTmaotKJrsOWtMXzSA6Ac6oQxjI7qblXkbk9BayDZLD+jniy/Krif5Q==
+"@graphai/vanilla@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@graphai/vanilla/-/vanilla-0.0.5.tgz#61176a94fea31bbafd811189410f9aea3914cb43"
+  integrity sha512-4jnoreA7HpmfUQ01WgEy3DTaXYFBcKCIOiu2bbnbV4F1nqBk5iwOR3++WUy5+0wcrDb2Oqmc+gLmdlJO4EsB+w==
 
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"

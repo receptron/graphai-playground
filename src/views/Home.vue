@@ -114,13 +114,11 @@ import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from 
 
 import YAML from "yaml";
 
-//const serverAgentIds = ["groqAgent", "slashGPTAgent", "openAIAgent", "fetchAgent", "wikipediaAgent"];
-const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
+// const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
 
-const useAgentFilter = (serverAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
-  console.log(serverAgentIds);
+const useAgentFilter = (serverAgentIds: string[], streamAgentIds: string[], callback: (context: AgentFunctionContext, data: T) => void) => {
   const streamAgentFilter = streamAgentFilterGenerator(callback);
-
+  console.log(streamAgentFilter);
   const agentFilters = [
     {
       name: "streamAgentFilter",
@@ -202,13 +200,20 @@ export default defineComponent({
         tmp[a.agentId] = a;
         return tmp;
       }, {});
-      console.log(res.agents);
     })();
     const serverAgentIds = computed(() => {
       return Object.values(serverAgentsInfoDictionary.value).map((a) => a.agentId) ?? [];
-      //return Object.keys(serverAgentsInfoDictionary.value) || [];
     });
-
+    const webAgentIds = computed(() => {
+      return Object.keys(webAgents);
+    });
+    const streamAgentIds = computed(() => {
+      return [
+        ...Object.values(serverAgentsInfoDictionary.value).filter(a => a.stream).map(a => a.agentId),
+        ...Object.values(webAgents).filter(a => a.stream).map(a => a.name)
+      ]
+    });
+    
     const callback = (context: AgentFunctionContext, data: string) => {
       const { nodeId } = context.debugInfo;
       streamingData.value[nodeId] = (streamingData.value[nodeId] ?? "") + data;
@@ -217,7 +222,7 @@ export default defineComponent({
     const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
 
     const runGraph = async () => {
-      const agentFilters = useAgentFilter(serverAgentIds.value, callback);
+      const agentFilters = useAgentFilter(serverAgentIds.value, streamAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
       }
@@ -249,9 +254,6 @@ export default defineComponent({
       currentName.value = selectedLocalName.value;
     };
 
-    const webAgentIds = computed(() => {
-      return Object.keys(webAgents);
-    });
     const addAgentToGraph = (agentId: string) => {
       if (isValudGraph.value) {
         const nodeId = prompt("NodeId");

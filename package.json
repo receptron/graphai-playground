@@ -11,7 +11,7 @@
   "dependencies": {
     "@graphai/agent_filters": "^0.0.5",
     "@graphai/sleeper_agents": "^0.0.2",
-    "@graphai/vanilla": "^0.0.3",
+    "@graphai/vanilla": "^0.0.5",
     "@receptron/graphai_vue_cytoscape": "^0.0.3",
     "@types/cytoscape": "^3.21.0",
     "@vueuse/head": "^1.0.16",
