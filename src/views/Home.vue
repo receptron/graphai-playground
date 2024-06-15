@@ -1,34 +1,70 @@
 <template>
   <div class="home">
     <div>
-      <div>
-        <div class="w-10/12 h-96 bg-white rounded-md mt-4 mx-auto border-2">
-          <div ref="cytoscapeRef" class="w-full h-full" />
+      <div class="w-10/12 mx-auto rounded-md mt-4">
+        <div class="flex">
+          <div class="w-8/12">
+            <!-- textarea -->
+            <textarea
+              v-model="graphText"
+              :rows="graphText.split('\n').length + 5"
+              class="p-2 w-full rounded-md border-2 resize-y focus:outline-none"
+              :class="isValudGraph ? '' : 'border-red-500'"
+            />
+          </div>
+          <div class="w-4/12 text-left p-2">
+            <div>
+              Preset:
+              <select v-model="selectedGraphIndex" class="border rounded-md p-2">
+                <option v-for="(option, index) in graphDataSet" :value="index" :key="index">
+                  {{ option.name }}
+                </option>
+              </select>
+              <button @click="load" class="border-2 rounded-md ml-2 p-2">load</button>
+            </div>
+            <div v-if="localStorageList.length > 0">
+              You:
+              <select v-model="selectedLocalGraphIndex" class="border rounded-md p-2">
+                <option v-for="(option, index) in localStorageList" :value="index" :key="index">
+                  {{ option }}
+                </option>
+              </select>
+              <button @click="loadLocal" class="border-2 rounded-md ml-2 p-2">load</button>
+            </div>
+            <div>
+              <button @click="save" class="border-2 rounded-md m-2 p-2">save</button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="flex">
-        <div class="w-1/8 items-center justify-center">
-          <div>
-            <select v-model="selectedGraphIndex" class="border rounded-md p-2 m-2">
-              <option v-for="(option, index) in graphDataSet" :value="index" :key="index">
-                {{ option.name }}
-              </option>
-            </select>
+
+      <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
+        <div class="h-full">
+          <div class="p-2">
+            <!-- run button -->
+            <div>
+              <button class="text-white font-bold items-center rounded-full px-4 py-2 m-1 bg-sky-500 hover:bg-sky-700" @click="agentServer">Run</button>
+            </div>
           </div>
 
+          <!-- cytoscape -->
           <div>
-            <button class="text-white font-bold items-center rounded-full px-4 py-2 m-1 bg-sky-500 hover:bg-sky-700" @click="agentServer">Run</button>
+            <div class="h-60 bg-white align-top m-2">
+              <div ref="cytoscapeRef" class="w-full h-full" />
+            </div>
           </div>
-        </div>
-
-        <div class="w-7/8 text-left">
-          <div class="w-full break-words whitespace-pre-wrap">
-            Streaming<br />
-            {{ JSON.stringify(streamingData, null, 2) }}
-          </div>
-          <div>
-            Result<br />
-            {{ JSON.stringify(result, null, 2) }}
+          <div class="flex h-full">
+            <!-- log -->
+            <div class="w-1/2 break-words whitespace-pre-wrap">
+              Streaming<br />
+              <TextAreaView :data-object="streamingData" />
+            </div>
+            <div class="w-1/2">
+              Result<br />
+              <div class="text-left p-4">
+                <TextAreaView :data-object="result" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -48,6 +84,10 @@ import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filt
 import { graphDataSet } from "@/utils/graph_data";
 
 import { useCytoscape } from "@receptron/graphai_vue_cytoscape";
+
+import TextAreaView from "../components/TextAreaView.vue";
+
+import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./localStorage";
 
 const serverAgentIds = ["groqAgent", "slashGPTAgent", "openAIAgent", "fetchAgent", "wikipediaAgent"];
 const streamAgents = ["groqAgent", "slashGPTAgent", "openAIAgent", "streamMockAgent"];
@@ -75,13 +115,39 @@ const useAgentFilter = (callback: (context: AgentFunctionContext, data: T) => vo
   return agentFilters;
 };
 
+const useGraphInput = () => {
+  const graphText = ref("");
+  const graphData = computed(() => {
+    try {
+      return JSON.parse(graphText.value);
+    } catch (e) {
+      return null;
+    }
+  });
+  const isValudGraph = computed(() => {
+    return graphData.value !== null;
+  });
+  return { graphText, graphData, isValudGraph };
+};
+
 export default defineComponent({
   name: "HomePage",
-  components: {},
+  components: {
+    TextAreaView,
+  },
   setup() {
+    const { graphText, graphData, isValudGraph } = useGraphInput();
+
     const selectedGraphIndex = ref(0);
     const selectedGraph = computed(() => {
       return graphDataSet[selectedGraphIndex.value].data;
+    });
+
+    const currentName = ref("");
+    const selectedLocalGraphIndex = ref(0);
+    const localStorageList = ref(loadLocalStorageList());
+    const selectedLocalName = computed(() => {
+      return localStorageList.value[selectedLocalGraphIndex.value];
     });
 
     const streamingData = ref<Record<string, unknown>>({});
@@ -93,13 +159,16 @@ export default defineComponent({
     };
     const agentFilters = useAgentFilter(callback);
 
-    const { updateCytoscape, cytoscapeRef } = useCytoscape(selectedGraph);
+    const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
 
     const runGraph = async () => {
+      if (!isValudGraph.value) {
+        return;
+      }
       result.value = {};
       streamingData.value = {};
 
-      const graphai = new GraphAI(selectedGraph.value, { ...agents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds });
+      const graphai = new GraphAI(graphData.value, { ...agents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds });
       graphai.onLogCallback = (log) => {
         const isServer = serverAgentIds.includes(log.agentId);
         updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
@@ -107,9 +176,23 @@ export default defineComponent({
       result.value = await graphai.run();
     };
 
+    const save = () => {
+      currentName.value = saveGraphToLocalStorage(graphText.value, currentName.value);
+      localStorageList.value = loadLocalStorageList();
+    };
+
     const agentServer = async () => {
       runGraph();
     };
+
+    const load = () => {
+      graphText.value = JSON.stringify({ ...selectedGraph.value }, null, 2);
+    };
+    const loadLocal = () => {
+      graphText.value = loadLocalStorage(selectedLocalName.value) ?? "";
+      currentName.value = selectedLocalName.value;
+    };
+
     return {
       agentServer,
       runGraph,
@@ -119,6 +202,17 @@ export default defineComponent({
 
       graphDataSet,
       selectedGraphIndex,
+
+      graphText,
+      load,
+
+      isValudGraph,
+
+      // local storage
+      save,
+      localStorageList,
+      selectedLocalGraphIndex,
+      loadLocal,
 
       cytoscapeRef,
     };

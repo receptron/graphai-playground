@@ -1,39 +1,12 @@
 const graph_data1 = {
   version: 0.5,
-  loop: {
-    while: ":people",
-  },
   nodes: {
-    people: {
-      value: ["Steve Jobs", "Elon Musk", "Nikola Tesla"],
-      update: ":retriever.array",
+    node1: {
+      value: "test",
     },
-    result: {
-      value: [],
-      update: ":reducer2",
-      isResult: true,
-    },
-    retriever: {
-      agent: "shiftAgent",
-      inputs: { array: ":people" },
-    },
-    query: {
-      agent: "slashGPTAgent",
-      params: {
-        manifest: {
-          model: "gpt-3.5-turbo",
-          prompt: "Describe about the person in less than 100 words",
-        },
-      },
-      inputs: [":retriever.item"],
-    },
-    reducer1: {
-      agent: "popAgent",
-      inputs: { array: ":query" },
-    },
-    reducer2: {
-      agent: "pushAgent",
-      inputs: { array: ":result", item: ":reducer1.item" },
+    node2: {
+      agent: "copyAgent",
+      inputs: [":node1"],
     },
   },
 };
@@ -90,81 +63,10 @@ const graph_data4 = {
   },
 };
 
-const graph_callcenter = {
-  version: 0.3,
-  nodes: {
-    customerPhoneAudioLog: {
-      agent: "streamMockAgent",
-      params: {
-        message: "hi, tell me hoge hoge",
-      },
-    },
-    audio2text: {
-      agent: "streamMockAgent",
-      params: {
-        message: "hi, tell me hoge hoge",
-      },
-      inputs: [":customerPhoneAudioLog"],
-    },
-    sentiment: {
-      agent: "streamMockAgent",
-      params: {
-        message: "angry",
-      },
-      inputs: [":customerPhoneAudioLog"],
-    },
-    talkAnalysis: {
-      inputs: [":audio2text"],
-      agent: "streamMockAgent",
-      params: {
-        message: "this is message",
-      },
-    },
-    functionCalling: {
-      inputs: [":talkAnalysis"],
-      agent: "streamMockAgent",
-    },
-    onpremiseApi: {
-      inputs: [":functionCalling", ":RAG"],
-      agent: "streamMockAgent",
-    },
-    RAG: {
-      inputs: [":sentiment", ":talkAnalysis"],
-      agent: "streamMockAgent",
-      params: {
-        message: "foo",
-      },
-    },
-    data2speech: {
-      inputs: [":RAG", ":talkAnalysis", ":onpremiseApi"],
-      agent: "streamMockAgent",
-    },
-    responseToCustomer: {
-      agent: "streamMockAgent",
-      inputs: [":data2speech"],
-      params: {
-        message: "response",
-      },
-      isResult: true,
-    },
-    storeToDatabase: {
-      inputs: [":sentiment", ":talkAnalysis", ":onpremiseApi"],
-      agent: "streamMockAgent",
-      params: {
-        message: "response",
-      },
-    },
-  },
-};
-
 export const graphDataSet = [
   {
-    data: graph_callcenter,
-    name: "callcenter",
-  },
-  {
     data: graph_data1,
-    name: "slashgpt",
+    name: "template",
   },
   {
     data: graph_data2,
