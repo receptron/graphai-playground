@@ -119,13 +119,13 @@ import { sleeperAgent } from "@graphai/sleeper_agents";
 import { useCytoscape } from "@receptron/graphai_vue_cytoscape";
 
 import TextAreaView from "@/components/TextAreaView.vue";
+import VAceEditor from "@/components/ace.vue";
 
 import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./home/localStorage";
 import { useSelectGraph, useGraphInput, getAgentFilter, useServerAgent, useStreamingData } from "./home/utils";
 
 import YAML from "yaml";
 
-import VAceEditor from "../utils/ace/index.vue";
 import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
 import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
 import Ace, { config } from "ace-builds";

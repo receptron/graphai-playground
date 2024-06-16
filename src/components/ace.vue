@@ -9,7 +9,7 @@ import ace, { type Ace } from "ace-builds";
 import { capitalize, defineComponent, markRaw, h, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import ResizeObserver from "resize-observer-polyfill";
 
-import type { VAceEditorInstance } from "./types";
+import type { VAceEditorInstance } from "@/utils/ace/types";
 
 const Events = ["blur", "input", "change", "changeSelectionStyle", "changeSession", "copy", "focus", "paste"];
 
