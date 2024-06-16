@@ -5,14 +5,13 @@
         <div class="flex">
           <div class="w-8/12 border-2" :class="isValudGraph ? '' : 'border-red-500'">
             <!-- textarea -->
-            <v-ace-editor class="h-full" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
-            <!--
-            <textarea
-              v-model="graphText"
-              :rows="graphText.split('\n').length + 5"
-              class="p-2 w-full rounded-md border-2 resize-y focus:outline-none"
-              />
-            -->
+            <v-ace-editor
+              class="h-full"
+              v-model:value="graphText"
+              lang="yaml"
+              theme="chrome"
+              @init="editorInit"
+            />
           </div>
           <div class="w-4/12 text-left p-2">
             <div>
@@ -97,12 +96,12 @@
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
         ErrorLog
-        <div class=" break-words">{{ errorLog }}</div>
+        <div class="break-words">{{ errorLog }}</div>
       </div>
 
       <div class="w-10/12 mx-auto rounded-md border-2 mt-4">
         GraphLog
-        <div v-for="(log, key) in graphLog" :key="key" class="text-left  break-words">
+        <div v-for="(log, key) in graphLog" :key="key" class="text-left break-words">
           {{ log }}
         </div>
       </div>
@@ -126,10 +125,10 @@ import { useSelectGraph, useGraphInput, getAgentFilter, useServerAgent, useStrea
 
 import YAML from "yaml";
 
-import { VAceEditor } from "vue3-ace-editor";
+import { VAceEditor } from "../utils/ace";
 import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
 import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
-import { config } from "ace-builds";
+import Ace, { config } from "ace-builds";
 
 config.setModuleUrl("ace/mode/yaml", modeYaml);
 config.setModuleUrl("ace/theme/chrome", chromeTheme);
