@@ -125,7 +125,7 @@ import { useSelectGraph, useGraphInput, getAgentFilter, useServerAgent, useStrea
 
 import YAML from "yaml";
 
-import { VAceEditor } from "../utils/ace";
+import VAceEditor from "../utils/ace/index.vue";
 import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
 import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
 import Ace, { config } from "ace-builds";
