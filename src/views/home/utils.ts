@@ -67,7 +67,21 @@ export const getAgentFilter = <T>(
   return agentFilters;
 };
 
-type serverAgentInfo = Record<string, string | number>;
+// TODO: from express
+type ExpressAgentInfo = {
+  agentId: string;
+  name: string;
+  url: string;
+  description: string;
+  category: string[];
+  author: string;
+  license: string;
+  repository: string;
+  samples: any; // TODO: AgentFunctionInfoSample from graph
+  inputs: any;
+  output: any;
+  stream: boolean;
+};
 
 export const useServerAgent = (listUrl: string) => {
   const getServerAgents = async () => {
@@ -75,11 +89,11 @@ export const useServerAgent = (listUrl: string) => {
     return await response.json();
   };
 
-  const serverAgentsInfoDictionary = ref<Record<string, serverAgentInfo>>({});
+  const serverAgentsInfoDictionary = ref<Record<string, ExpressAgentInfo>>({});
 
   (async () => {
     const res = await getServerAgents();
-    serverAgentsInfoDictionary.value = res.agents.reduce((tmp: Record<string, serverAgentInfo>, a: serverAgentInfo) => {
+    serverAgentsInfoDictionary.value = res.agents.reduce((tmp: Record<string, ExpressAgentInfo>, a: ExpressAgentInfo) => {
       tmp[a.agentId] = a;
       return tmp;
     }, {});

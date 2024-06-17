@@ -4,17 +4,12 @@ import Blank from "@/components/Blank.vue";
 import NotFound from "@/components/NotFound.vue";
 
 import Home from "@/views/Home.vue";
-import Random from "@/views/Random.vue";
 import List from "@/views/List.vue";
 
 const routeChildren: Array<RouteRecordRaw> = [
   {
     path: "",
     component: Home,
-  },
-  {
-    path: "random",
-    component: Random,
   },
   {
     path: "list",

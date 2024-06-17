@@ -1,10 +1,8 @@
 <template>
-  <div ref="editorRef">
-  </div>
+  <div ref="editorRef"></div>
 </template>
 
 <script lang="ts">
-  
 import ace, { type Ace } from "ace-builds";
 import { capitalize, defineComponent, markRaw, h, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import ResizeObserver from "resize-observer-polyfill";
@@ -46,7 +44,7 @@ export default defineComponent({
     },
     minLines: {
       type: Number,
-      default: undefined,
+      default: 100,
     },
     maxLines: {
       type: Number,
@@ -54,14 +52,17 @@ export default defineComponent({
     },
   },
   emits: ["update:value", "init", ...Events],
-  setup(props, {emit}) {
+  setup(props, { emit }) {
     const editorRef = ref(null);
-    let editor;
-    let resizeObserver;
+    let editor: Ace.Editor;
+    let resizeObserver: ResizeObserver;
     let isSettingContent = false;
     let contentBackup = props.value;
-    
+
     onMounted(() => {
+      if (editorRef.value === null) {
+        return;
+      }
       editor = ace.edit(editorRef.value, {
         placeholder: props.placeholder,
         readOnly: props.readonly,
@@ -76,30 +77,31 @@ export default defineComponent({
         ...props.options,
       });
 
-      editor.on('change', () => {
+      editor.on("change", () => {
         if (isSettingContent) return;
         const content = editor.getValue();
         contentBackup = content;
-        emit('update:value', content);
+        emit("update:value", content);
       });
-      
+
       Events.forEach((x) => {
         const eventName = `on${capitalize(x)}`;
-        if (typeof emit[eventName] === 'function') {
-          editor.on(x, emit.bind(this, x));
+        if (eventName in emit) {
+          // if (typeof emit[eventName] === "function") {
+          editor.on(x as "gutterkeydown", emit.bind(this, x));
         }
       });
-      
+
       resizeObserver = new ResizeObserver(() => editor.resize());
       resizeObserver.observe(editorRef.value);
-      emit('init', editor);
+      emit("init", editor);
     });
-    
+
     onBeforeUnmount(() => {
       resizeObserver?.disconnect();
       editor?.destroy();
     });
-    
+
     watch(
       () => props.value,
       (newValue) => {
@@ -114,70 +116,70 @@ export default defineComponent({
         }
       },
     );
-    
+
     watch(
       () => props.theme,
       (newTheme) => {
         editor.setTheme(`ace/theme/${newTheme}`);
       },
     );
-    
+
     watch(
       () => props.options,
       (newOptions) => {
         editor.setOptions(newOptions);
       },
     );
-    
+
     watch(
       () => props.readonly,
       (newReadonly) => {
         editor.setReadOnly(newReadonly);
       },
     );
-    
+
     watch(
       () => props.placeholder,
       (newPlaceholder) => {
-        editor.setOption('placeholder', newPlaceholder);
+        editor.setOption("placeholder", newPlaceholder);
       },
     );
-    
+
     watch(
       () => props.wrap,
       (newWrap) => {
         editor.setWrapBehavioursEnabled(newWrap);
       },
     );
-    
+
     watch(
       () => props.printMargin,
       (newPrintMargin) => {
-        editor.setOption('printMargin', newPrintMargin);
+        editor.setOption("printMargin", newPrintMargin);
       },
     );
-    
+
     watch(
       () => props.lang,
       (newLang) => {
-        editor.setOption('mode', `ace/mode/${newLang}`);
+        editor.setOption("mode", `ace/mode/${newLang}`);
       },
     );
-    
+
     watch(
       () => props.minLines,
       (newMinLines) => {
-        editor.setOption('minLines', newMinLines);
+        editor.setOption("minLines", newMinLines);
       },
     );
-    
+
     watch(
       () => props.maxLines,
       (newMaxLines) => {
-        editor.setOption('maxLines', newMaxLines);
+        editor.setOption("maxLines", newMaxLines);
       },
     );
-    
+
     const focus = () => editor.focus();
     const blur = () => editor.blur();
     const selectAll = () => editor.selectAll();
@@ -189,8 +191,7 @@ export default defineComponent({
       blur,
       selectAll,
       getAceInstance,
-    }
+    };
   },
 });
-
 </script>

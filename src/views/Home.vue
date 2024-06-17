@@ -5,13 +5,7 @@
         <div class="flex">
           <div class="w-8/12 border-2" :class="isValudGraph ? '' : 'border-red-500'">
             <!-- textarea -->
-            <v-ace-editor
-              class="h-full"
-              v-model:value="graphText"
-              lang="yaml"
-              theme="chrome"
-              @init="editorInit"
-            />
+            <v-ace-editor class="h-full" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
           </div>
           <div class="w-4/12 text-left p-2">
             <div>
@@ -155,7 +149,7 @@ export default defineComponent({
       return localStorageList.value[selectedLocalGraphIndex.value];
     });
 
-    const result = ref<unknown>({});
+    const result = ref < Record<string, any>({});
 
     const { serverAgentsInfoDictionary, serverAgentIds } = useServerAgent("http://localhost:8085/agents/list");
 
@@ -194,17 +188,17 @@ export default defineComponent({
 
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
           //console.log(log)
-          const isServer = serverAgentIds.value.includes(log.agentId);
+          const isServer = serverAgentIds.value.includes(log.agentId || "");
           updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
         };
         result.value = await graphai.run();
       } catch (e) {
-        errorLog.value = e;
+        errorLog.value = e as string;
       }
     };
 
     const save = () => {
-      currentName.value = saveGraphToLocalStorage(graphText.value, currentName.value);
+      currentName.value = saveGraphToLocalStorage(graphText.value, currentName.value) || "";
       localStorageList.value = loadLocalStorageList();
     };
 
