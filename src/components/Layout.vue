@@ -26,7 +26,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
+import { defineComponent, ref } from "vue";
 
 import { useI18nParam } from "@/i18n/utils";
 

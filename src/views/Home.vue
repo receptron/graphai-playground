@@ -81,7 +81,7 @@
             <div class="w-1/2">
               Result<br />
               <div class="text-left p-4">
-                <TextAreaView :data-object="result" />
+                <TextAreaView :data-object="graphResult" />
               </div>
             </div>
           </div>
@@ -106,7 +106,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 
-import { GraphAI } from "graphai";
+import { GraphAI, NodeState, AgentFunctionInfoDictionary } from "graphai";
 
 import * as webAgents from "@graphai/vanilla";
 import { sleeperAgent } from "@graphai/sleeper_agents";
@@ -122,7 +122,7 @@ import YAML from "yaml";
 
 import modeYaml from "ace-builds/src-noconflict/mode-yaml?url";
 import chromeTheme from "ace-builds/src-noconflict/theme-chrome?url";
-import Ace, { config } from "ace-builds";
+import { Ace, config } from "ace-builds";
 
 config.setModuleUrl("ace/mode/yaml", modeYaml);
 config.setModuleUrl("ace/theme/chrome", chromeTheme);
@@ -149,7 +149,7 @@ export default defineComponent({
       return localStorageList.value[selectedLocalGraphIndex.value];
     });
 
-    const result = ref < Record<string, any>({});
+    const graphResult = ref<Record<string, any>>({});
 
     const { serverAgentsInfoDictionary, serverAgentIds } = useServerAgent("http://localhost:8085/agents/list");
 
@@ -178,7 +178,7 @@ export default defineComponent({
       if (!isValudGraph.value) {
         return;
       }
-      result.value = {};
+      graphResult.value = {};
       streamingData.value = {};
 
       try {
@@ -189,9 +189,9 @@ export default defineComponent({
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
           //console.log(log)
           const isServer = serverAgentIds.value.includes(log.agentId || "");
-          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
+          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? ("executing-server" as NodeState) : log.state);
         };
-        result.value = await graphai.run();
+        graphResult.value = await graphai.run();
       } catch (e) {
         errorLog.value = e as string;
       }
@@ -224,7 +224,8 @@ export default defineComponent({
       }
     };
     const infoWebAgent = (agentId: string) => {
-      console.log(webAgents[agentId]);
+      const agents: AgentFunctionInfoDictionary = webAgents
+      console.log(agents[agentId]);
     };
     const infoServerAgent = (agentId: string) => {
       console.log(serverAgentsInfoDictionary.value);
@@ -235,7 +236,7 @@ export default defineComponent({
       runGraph,
 
       streamingData,
-      result,
+      graphResult,
 
       graphDataSet,
       selectedGraphIndex,
