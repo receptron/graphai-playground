@@ -1,7 +1,7 @@
 import { ref, computed } from "vue";
 import YAML from "yaml";
 
-import { AgentFunctionContext } from "graphai";
+import { AgentFunctionContext, AgentFunctionInfoSample } from "graphai";
 
 import { graphDataSet } from "@/utils/graph_data";
 import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
@@ -78,7 +78,7 @@ type ExpressAgentInfo = {
   author: string;
   license: string;
   repository: string;
-  samples: any; // TODO: AgentFunctionInfoSample from graph
+  samples: AgentFunctionInfoSample;
   inputs: any;
   output: any;
   stream: boolean;

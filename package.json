@@ -18,7 +18,7 @@
     "ace-builds": "^1.35.0",
     "core-js": "^3.25.2",
     "deepmerge": "^4.3.1",
-    "graphai": "^0.5.1",
+    "graphai": "^0.5.2",
     "pinia": "^2.1.7",
     "resize-observer-polyfill": "^1.5.1",
     "vue": "^3.4.4",
