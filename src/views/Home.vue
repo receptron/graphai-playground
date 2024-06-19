@@ -106,7 +106,7 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 
-import { GraphAI, NodeState, AgentFunctionInfoDictionary } from "graphai";
+import { GraphAI, AgentFunctionInfoDictionary } from "graphai";
 
 import * as webAgents from "@graphai/vanilla";
 import { sleeperAgent } from "@graphai/sleeper_agents";
@@ -189,7 +189,7 @@ export default defineComponent({
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
           //console.log(log)
           const isServer = serverAgentIds.value.includes(log.agentId || "");
-          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? ("executing-server" as NodeState) : log.state);
+          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? "executing-server" : log.state);
         };
         graphResult.value = await graphai.run();
       } catch (e) {
