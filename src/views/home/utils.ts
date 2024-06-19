@@ -78,7 +78,7 @@ type ExpressAgentInfo = {
   author: string;
   license: string;
   repository: string;
-  samples: AgentFunctionInfoSample;
+  samples: AgentFunctionInfoSample[];
   inputs: any;
   output: any;
   stream: boolean;
