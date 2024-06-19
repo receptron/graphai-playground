@@ -182,10 +182,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.57.0.tgz#a5417ae8427873f1dd08b70b3574b453e67b5f7f"
   integrity sha512-Ys+3g2TaW7gADOJzPt83SJtCDhMjndcDMFVQ/Tj9iA1BfJzFKD9mAUXT3OenpuPHbI6P/myECxRJrofUsDx/5g==
 
-"@graphai/agent_filters@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@graphai/agent_filters/-/agent_filters-0.0.5.tgz#dd26e72e200cb8c3a5f09a620fd6cf1df19bb7e3"
-  integrity sha512-wc6YC5KT2toms2q0dGVwkUExNYMK8CojpqkIf1k9bgf3Ii139bF4dXr7ZpBQXP+pYJWzp2eFCDdlx0iew787XA==
+"@graphai/agent_filters@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@graphai/agent_filters/-/agent_filters-0.0.6.tgz#fff30befb1c3c9ab0f053b300d5982e3e0a79411"
+  integrity sha512-7EGPDfc++YsioKzYKHZsCkvYRJp14d3t7UpmPlH711Gos5qJOfjUfTDVFUMLCJN+zzIILbZfPQ1SVjNM+XH+EQ==
   dependencies:
     ajv "^8.16.0"
 
@@ -2354,13 +2354,6 @@ vue-tsc@^1.8.27:
     "@volar/typescript" "~1.11.1"
     "@vue/language-core" "1.8.27"
     semver "^7.5.4"
-
-vue3-ace-editor@^2.2.4:
-  version "2.2.4"
-  resolved "https://registry.yarnpkg.com/vue3-ace-editor/-/vue3-ace-editor-2.2.4.tgz#1f2a787f91cf7979f27fab29e0e0604bb3ee1c17"
-  integrity sha512-FZkEyfpbH068BwjhMyNROxfEI8135Sc+x8ouxkMdCNkuj/Tuw83VP/gStFQqZHqljyX9/VfMTCdTqtOnJZGN8g==
-  dependencies:
-    resize-observer-polyfill "^1.5.1"
 
 vue@^3.4.4:
   version "3.4.27"

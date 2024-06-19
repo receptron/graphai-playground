@@ -41,11 +41,12 @@ export const useGraphInput = () => {
 };
 
 export const getAgentFilter = <T>(
-  httpAgentUrl: string,
+  serverAgentUrlDictionary: Record<string, string>,
   serverAgentIds: string[],
   streamAgentIds: string[],
   callback: (context: AgentFunctionContext, data: T) => void,
 ) => {
+  console.log(serverAgentUrlDictionary);
   const streamAgentFilter = streamAgentFilterGenerator(callback);
   const agentFilters = [
     {
@@ -58,7 +59,7 @@ export const getAgentFilter = <T>(
       agent: httpAgentFilter,
       filterParams: {
         server: {
-          baseUrl: httpAgentUrl,
+          serverAgentUrlDictionary,
         },
       },
       agentIds: serverAgentIds,
@@ -83,21 +84,26 @@ type ExpressAgentInfo = {
   stream: boolean;
 };
 
-export const useServerAgent = (listUrl: string) => {
-  const getServerAgents = async () => {
-    const response = await fetch(listUrl);
+export const useServerAgent = (agentBaseUrls: string[]) => {
+  const serverAgentUrlDictionary: Record<string, string> = {};
+  const getServerAgents = async (url: string) => {
+    const response = await fetch(url + "/list");
     return await response.json();
   };
 
   const serverAgentsInfoDictionary = ref<Record<string, ExpressAgentInfo>>({});
 
-  (async () => {
-    const res = await getServerAgents();
+  agentBaseUrls.forEach(async (url) => {
+    const res = await getServerAgents(url);
     serverAgentsInfoDictionary.value = res.agents.reduce((tmp: Record<string, ExpressAgentInfo>, a: ExpressAgentInfo) => {
+      if (tmp[a.agentId]) {
+        console.log("duplicate agent: " + a.agentId);
+      }
+      serverAgentUrlDictionary[a.agentId] = url + "/" + a.agentId;
       tmp[a.agentId] = a;
       return tmp;
     }, {});
-  })();
+  });
 
   const serverAgentIds = computed(() => {
     return (
@@ -106,7 +112,7 @@ export const useServerAgent = (listUrl: string) => {
       }) ?? []
     );
   });
-  return { serverAgentsInfoDictionary, serverAgentIds };
+  return { serverAgentsInfoDictionary, serverAgentIds, serverAgentUrlDictionary };
 };
 
 export const useStreamingData = () => {

@@ -151,7 +151,8 @@ export default defineComponent({
 
     const graphResult = ref<Record<string, any>>({});
 
-    const { serverAgentsInfoDictionary, serverAgentIds } = useServerAgent("http://localhost:8085/agents/list");
+    const httpAgentUrl = "http://localhost:8085/agents";
+    const { serverAgentsInfoDictionary, serverAgentIds, serverAgentUrlDictionary } = useServerAgent([httpAgentUrl]);
 
     const webAgentIds = computed(() => {
       return Object.keys(webAgents);
@@ -173,8 +174,7 @@ export default defineComponent({
     const errorLog = ref("");
     const graphLog = ref<string[]>([]);
     const runGraph = async () => {
-      const httpAgentUrl = "http://localhost:8085/agents";
-      const agentFilters = getAgentFilter(httpAgentUrl, serverAgentIds.value, streamAgentIds.value, callback);
+      const agentFilters = getAgentFilter(serverAgentUrlDictionary, serverAgentIds.value, streamAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
       }
@@ -224,7 +224,7 @@ export default defineComponent({
       }
     };
     const infoWebAgent = (agentId: string) => {
-      const agents: AgentFunctionInfoDictionary = webAgents
+      const agents: AgentFunctionInfoDictionary = webAgents;
       console.log(agents[agentId]);
     };
     const infoServerAgent = (agentId: string) => {
