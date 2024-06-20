@@ -311,6 +311,13 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@receptron/graphai_express_type@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@receptron/graphai_express_type/-/graphai_express_type-0.0.1.tgz#2fa53852cc5a49a3df31a65f8dab8350d5f22939"
+  integrity sha512-TQQLLx6oPdrqltBoppuhNSlxGXIP62bgxQfDXljIXfNmNu33jzgfqjpui+JD383KlZ6oQe+RNP0L+IcRyHakhA==
+  dependencies:
+    graphai "^0.5.2"
+
 "@receptron/graphai_vue_cytoscape@^0.0.3":
   version "0.0.3"
   resolved "https://registry.yarnpkg.com/@receptron/graphai_vue_cytoscape/-/graphai_vue_cytoscape-0.0.3.tgz#6b02a6d0dd6f832ecc4a623ee429f4941863d3ad"
