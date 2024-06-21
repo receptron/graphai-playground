@@ -12,7 +12,7 @@ const graph_data1 = {
 };
 
 const graph_data2 = {
-  version: 0.3,
+  version: 0.5,
   nodes: {
     query: {
       agent: "streamMockAgent",
@@ -30,7 +30,7 @@ const graph_data2 = {
 };
 
 const graph_data3 = {
-  version: 0.3,
+  version: 0.5,
   nodes: {
     node1: {
       value: "Please tell me about photosynthesis in 50 words.",
@@ -74,7 +74,7 @@ export const graphDataSet = [
   },
   {
     data: graph_data3,
-    name: "openai",
+    name: "openai stream",
   },
   {
     data: graph_data4,
