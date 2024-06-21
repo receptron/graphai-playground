@@ -185,9 +185,8 @@ export default defineComponent({
         const graphai = new GraphAI(graphData.value, { ...webAgents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds.value });
         graphai.onLogCallback = (log) => {
           const { agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage } = log;
-
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
-          //console.log(log)
+          console.log(log)
           const isServer = serverAgentIds.value.includes(log.agentId || "");
           updateCytoscape(log.nodeId, log.state === "executing" && isServer ? NodeState.ExecutingServer : log.state);
         };

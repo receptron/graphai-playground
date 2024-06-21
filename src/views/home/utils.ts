@@ -72,7 +72,7 @@ export const getAgentFilter = <T>(
 export const useServerAgent = (agentBaseUrls: string[]) => {
   const serverAgentUrlDictionary: Record<string, string> = {};
   const getServerAgents = async (url: string) => {
-    const response = await fetch(url + "/list");
+    const response = await fetch(url);
     return await response.json();
   };
 

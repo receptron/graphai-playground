@@ -29,8 +29,7 @@ app.use(cors(options));
 
 const agents = {...llmAgents, ...serviceAgents, ...localAgent};
 
-app.get("/agents/list", agentsList(agents, "http://localhost:8085", "/agents"));
-app.get("/agents/:agentId", agentDoc(agents, "http://localhost:8085", "/agents"));
+app.get("/agents", agentsList(agents, "http://localhost:8085", "/agents"));
 app.post("/agents/:agentId", agentDispatcher(agents));
 
 const port = 8085;
