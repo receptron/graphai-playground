@@ -47,7 +47,6 @@ export const getAgentFilter = <T>(
   streamAgentIds: string[],
   callback: (context: AgentFunctionContext, data: T) => void,
 ) => {
-  console.log(serverAgentUrlDictionary);
   const streamAgentFilter = streamAgentFilterGenerator(callback);
   const agentFilters = [
     {

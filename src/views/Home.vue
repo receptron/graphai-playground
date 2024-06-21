@@ -157,6 +157,7 @@ export default defineComponent({
     const webAgentIds = computed(() => {
       return Object.keys(webAgents);
     });
+    console.log(serverAgentsInfoDictionary.value)
     const streamAgentIds = computed(() => {
       return [
         ...Object.values(serverAgentsInfoDictionary.value)
@@ -174,6 +175,7 @@ export default defineComponent({
     const errorLog = ref("");
     const graphLog = ref<string[]>([]);
     const runGraph = async () => {
+      console.log(streamAgentIds.value);
       const agentFilters = getAgentFilter(serverAgentUrlDictionary, serverAgentIds.value, streamAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
