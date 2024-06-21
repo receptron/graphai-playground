@@ -106,17 +106,18 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 
-import { GraphAI, AgentFunctionInfoDictionary, NodeState } from "graphai";
+import { AgentFunctionInfoDictionary, NodeState } from "graphai";
 
 import * as webAgents from "@graphai/vanilla";
-import { sleeperAgent } from "@graphai/sleeper_agents";
+import * as sleeperAgents from "@graphai/sleeper_agents";
 import { useCytoscape } from "@receptron/graphai_vue_cytoscape";
 
 import TextAreaView from "@/components/TextAreaView.vue";
 import VAceEditor from "@/components/ace.vue";
 
-import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "./home/localStorage";
-import { useSelectGraph, useGraphInput, getAgentFilter, useServerAgent, useStreamingData } from "./home/utils";
+import { saveGraphToLocalStorage, loadLocalStorageList, loadLocalStorage } from "../utils/home/localStorage";
+import { useSelectGraph, useGraphInput } from "../utils/home/utils";
+import { useGraph } from "../utils/home/graph";
 
 import YAML from "yaml";
 
@@ -149,46 +150,24 @@ export default defineComponent({
       return localStorageList.value[selectedLocalGraphIndex.value];
     });
 
-    const graphResult = ref<Record<string, any>>({});
+    const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
 
     const httpAgentUrl = "http://localhost:8085/agents";
-    const { serverAgentsInfoDictionary, serverAgentIds, serverAgentUrlDictionary } = useServerAgent([httpAgentUrl]);
-
-    const webAgentIds = computed(() => {
-      return Object.keys(webAgents);
-    });
-    console.log(serverAgentsInfoDictionary.value)
-    const streamAgentIds = computed(() => {
-      return [
-        ...Object.values(serverAgentsInfoDictionary.value)
-          .filter((a) => a.stream)
-          .map((a) => a.agentId),
-        ...Object.values(webAgents)
-          .filter((a) => a.stream)
-          .map((a) => a.name),
-      ];
-    });
-
-    const { updateCytoscape, cytoscapeRef } = useCytoscape(graphData);
-    const { streamingData, callback } = useStreamingData();
+    const { getGraph, streamingData, graphResult, serverAgentIds, serverAgentsInfoDictionary } = useGraph([httpAgentUrl], { ...webAgents, ...sleeperAgents });
 
     const errorLog = ref("");
     const graphLog = ref<string[]>([]);
     const runGraph = async () => {
-      console.log(streamAgentIds.value);
-      const agentFilters = getAgentFilter(serverAgentUrlDictionary, serverAgentIds.value, streamAgentIds.value, callback);
       if (!isValudGraph.value) {
         return;
       }
-      graphResult.value = {};
-      streamingData.value = {};
 
       try {
-        const graphai = new GraphAI(graphData.value, { ...webAgents, sleeperAgent }, { agentFilters, bypassAgentIds: serverAgentIds.value });
+        const graphai = getGraph(graphData.value);
         graphai.onLogCallback = (log) => {
           const { agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage } = log;
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
-          console.log(log)
+          console.log(log);
           const isServer = serverAgentIds.value.includes(log.agentId || "");
           updateCytoscape(log.nodeId, log.state === "executing" && isServer ? NodeState.ExecutingServer : log.state);
         };
@@ -232,6 +211,10 @@ export default defineComponent({
       console.log(serverAgentsInfoDictionary.value);
       console.log(serverAgentsInfoDictionary.value[agentId]);
     };
+    const webAgentIds = computed(() => {
+      return Object.keys(webAgents);
+    });
+
     return {
       agentServer,
       runGraph,
