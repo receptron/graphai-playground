@@ -4,7 +4,7 @@
       <div class="w-full flex-1">
         <div class="bg-blue-300">
           <div class="relative flex items-center">
-            <div @click="toggleMenu()" class="inline-flex h-14 w-14 flex-shrink-0 cursor-pointer items-center justify-center">
+            <div class="inline-flex h-14 w-14 flex-shrink-0 cursor-pointer items-center justify-center" @click="toggleMenu()">
               <span class="material-symbols-outlined text-warmgray-900 text-opacity-60">menu</span>
             </div>
             <div class="w-full items-center">Graph AI</div>
@@ -12,7 +12,7 @@
               <div class="bg-warmgray-100 flex w-64 flex-col bg-white shadow">
                 <MenuList @close-menu="toggleMenu()" />
               </div>
-              <div @click="toggleMenu()" class="flex-1 cursor-pointer bg-black bg-opacity-40"></div>
+              <div class="flex-1 cursor-pointer bg-black bg-opacity-40" @click="toggleMenu()"></div>
             </div>
           </div>
         </div>

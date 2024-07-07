@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col space-y-1 bg-white p-4">
-    <MenuItem @click="handleClose" link="/" icon="man" title="menu.top" />
-    <MenuItem @click="handleClose" link="/list" icon="list" title="menu.list" />
+    <MenuItem link="/" icon="man" title="menu.top" @click="handleClose" />
+    <MenuItem link="/list" icon="list" title="menu.list" @click="handleClose" />
   </div>
 </template>
 
@@ -14,10 +14,10 @@ import MenuItem from "@/components/MenuItem.vue";
 const emitClose = "close-menu";
 
 export default defineComponent({
-  emits: [emitClose],
   components: {
     MenuItem,
   },
+  emits: [emitClose],
   setup(_, ctx) {
     const store = useStore();
 

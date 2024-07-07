@@ -4,8 +4,7 @@ const localStorageListKey = localStoragePrefix + "-list";
 export const loadLocalStorageList = () => {
   try {
     const listString = localStorage.getItem(localStorageListKey) ?? "[]";
-    const listData = JSON.parse(listString);
-    return listData;
+    return JSON.parse(listString);
   } catch (e) {
     console.log(e);
     return [];
@@ -27,6 +26,5 @@ export const saveGraphToLocalStorage = (graphText: string, currentName: string) 
 
 export const loadLocalStorage = (name: string) => {
   const graphKey = localStoragePrefix + "-graph-" + name;
-  const graphString = localStorage.getItem(graphKey);
-  return graphString;
+  return localStorage.getItem(graphKey);
 };

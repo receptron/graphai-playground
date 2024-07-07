@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import { AgentFunctionContext, GraphAI, AgentFunctionInfoDictionary } from "graphai";
+import { AgentFunctionContext, GraphAI, GraphData, AgentFunctionInfoDictionary } from "graphai";
 
 import { streamAgentFilterGenerator, httpAgentFilter } from "@graphai/agent_filters";
 import { ExpressAgentInfo } from "@receptron/graphai_express_type";
@@ -11,7 +11,7 @@ const getAgentFilter = <T>(
   callback: (context: AgentFunctionContext, data: T) => void,
 ) => {
   const streamAgentFilter = streamAgentFilterGenerator(callback);
-  const agentFilters = [
+  return [
     {
       name: "streamAgentFilter",
       agent: streamAgentFilter,
@@ -28,7 +28,6 @@ const getAgentFilter = <T>(
       agentIds: serverAgentIds,
     },
   ];
-  return agentFilters;
 };
 
 const useServerAgent = (agentBaseUrls: string[]) => {
@@ -72,7 +71,7 @@ const useStreamingData = () => {
 };
 
 export const useGraph = (agentUrls: string[], clientAgents: AgentFunctionInfoDictionary) => {
-  const graphResult = ref<Record<string, any>>({});
+  const graphResult = ref<Record<string, unknown>>({});
 
   const { serverAgentsInfoDictionary, serverAgentIds, serverAgentUrlDictionary } = useServerAgent(agentUrls);
 
@@ -88,12 +87,11 @@ export const useGraph = (agentUrls: string[], clientAgents: AgentFunctionInfoDic
   });
 
   const { streamingData, callback } = useStreamingData();
-  const getGraph = (graphData: any) => {
+  const getGraph = (graphData: GraphData) => {
     const agentFilters = getAgentFilter(serverAgentUrlDictionary, serverAgentIds.value, streamAgentIds.value, callback);
     graphResult.value = {};
     streamingData.value = {};
-    const graphai = new GraphAI(graphData, clientAgents, { agentFilters, bypassAgentIds: serverAgentIds.value });
-    return graphai;
+    return new GraphAI(graphData, clientAgents, { agentFilters, bypassAgentIds: serverAgentIds.value });
   };
 
   return {

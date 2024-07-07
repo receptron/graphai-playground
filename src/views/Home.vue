@@ -5,29 +5,29 @@
         <div class="flex">
           <div class="w-8/12 border-2" :class="isValudGraph ? '' : 'border-red-500'">
             <!-- textarea -->
-            <v-ace-editor class="h-full" v-model:value="graphText" lang="yaml" theme="chrome" @init="editorInit" />
+            <v-ace-editor v-model:value="graphText" class="h-full" lang="yaml" theme="chrome" @init="editorInit" />
           </div>
           <div class="w-4/12 text-left p-2">
             <div>
               Preset:
               <select v-model="selectedGraphIndex" class="border rounded-md p-2">
-                <option v-for="(option, index) in graphDataSet" :value="index" :key="index">
+                <option v-for="(option, index) in graphDataSet" :key="index" :value="index">
                   {{ option.name }}
                 </option>
               </select>
-              <button @click="load" class="border-2 rounded-md ml-2 p-2">load</button>
+              <button class="border-2 rounded-md ml-2 p-2" @click="load">load</button>
             </div>
             <div v-if="localStorageList.length > 0">
               You:
               <select v-model="selectedLocalGraphIndex" class="border rounded-md p-2">
-                <option v-for="(option, index) in localStorageList" :value="index" :key="index">
+                <option v-for="(option, index) in localStorageList" :key="index" :value="index">
                   {{ option }}
                 </option>
               </select>
-              <button @click="loadLocal" class="border-2 rounded-md ml-2 p-2">load</button>
+              <button class="border-2 rounded-md ml-2 p-2" @click="loadLocal">load</button>
             </div>
             <div>
-              <button @click="save" class="border-2 rounded-md m-2 p-2">save</button>
+              <button class="border-2 rounded-md m-2 p-2" @click="save">save</button>
             </div>
             <div>
               <b>Nodes:</b>
@@ -38,17 +38,17 @@
             <div>
               <b>ServerAgents:</b>
               <div v-for="(agent, key) in serverAgentIds" :key="key">
-                <span @click="addAgentToGraph(agent)" class="cursor-pointer">
+                <span class="cursor-pointer" @click="addAgentToGraph(agent)">
                   {{ agent }}
                 </span>
-                <span @click="infoServerAgent(agent)" class="cursor-pointer"> (i) </span>
+                <span class="cursor-pointer" @click="infoServerAgent(agent)"> (i) </span>
               </div>
               <b>WebAgents:</b>
               <div v-for="(agent, key) in webAgentIds" :key="key">
-                <span @click="addAgentToGraph(agent)" class="cursor-pointer">
+                <span class="cursor-pointer" @click="addAgentToGraph(agent)">
                   {{ agent }}
                 </span>
-                <span @click="infoWebAgent(agent)" class="cursor-pointer"> (i) </span>
+                <span class="cursor-pointer" @click="infoWebAgent(agent)"> (i) </span>
               </div>
             </div>
           </div>

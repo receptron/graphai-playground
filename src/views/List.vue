@@ -14,7 +14,7 @@ export default defineComponent({
   name: "HomePage",
   components: {},
   setup() {
-    const list = ref<[string, any][]>([]);
+    const list = ref<[string, Record<string, unknown>][]>([]);
     const getdata = async () => {
       const url = "http://localhost:8085/agents/list";
       const result = await fetch(url, {
