@@ -1,13 +1,8 @@
 # llm streaming test
 
-## 🎯 Purpose
-
-
-Testing streaming of llm/slashgpt/graphai
-
 ## 📋 Requirements
 
-- Node.js version 18 or later.
+- Node.js version 20 or later.
 - https://github.com/receptron/graphai-agent-server
   - run server
 
