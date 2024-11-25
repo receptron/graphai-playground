@@ -6,6 +6,8 @@
 - https://github.com/receptron/graphai-agent-server
   - run server
 
+![screen](docs/screen.png)
+
 ## 📖 Instruction
 
 1. Git clone this repository
