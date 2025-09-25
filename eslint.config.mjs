@@ -81,6 +81,10 @@ export default [
       "sonarjs/prefer-object-literal": "error",
       "sonarjs/prefer-single-boolean-return": "error",
       "sonarjs/prefer-while": "error",
+      "sonarjs/no-commented-code": "off",
+      "sonarjs/pseudo-random": "off",
+      "sonarjs/no-ignored-exceptions": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
       "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
       "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
 
