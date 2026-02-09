@@ -169,7 +169,14 @@ export default defineComponent({
           graphLog.value.push(JSON.stringify({ agentId, startTime, endTime, nodeId, state, inputs, inputsData, isLoop, result, errorMessage }));
           console.log(log);
           const isServer = serverAgentIds.value.includes(log.agentId || "");
-          updateCytoscape(log.nodeId, log.state === "executing" && isServer ? NodeState.ExecutingServer : log.state);
+          if (isServer && log.state === "executing") {
+            const originalState = log.state;
+            log.state = NodeState.ExecutingServer;
+            updateCytoscape(log);
+            log.state = originalState;
+          } else {
+            updateCytoscape(log);
+          }
         };
         graphResult.value = await graphai.run();
       } catch (e) {
