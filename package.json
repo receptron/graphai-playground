@@ -16,7 +16,7 @@
     "@receptron/graphai_express_type": "^2.0.0",
     "@receptron/graphai_vue_cytoscape": "^0.2.0",
     "@types/cytoscape": "^3.21.4",
-    "@vueuse/head": "^1.0.16",
+    "@unhead/vue": "^3.2.3",
     "ace-builds": "^1.35.2",
     "core-js": "^3.25.2",
     "deepmerge": "^4.3.1",
