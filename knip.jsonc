@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  // Vite/Vue app: knip auto-detects the app entry (index.html -> src/main.ts) via its Vite
+  // plugin, so no "entry" is listed here (listing it triggers a "redundant entry" hint).
+  "project": ["src/**/*.{ts,vue}"],
+  "ignoreExportsUsedInFile": true,
+  "includeEntryExports": false,
+  "rules": {
+    // Warn mode: every rule is "warn" (reported, exit 0) or "off". Nothing gates CI here.
+    "files": "warn",
+    "dependencies": "warn",
+    "devDependencies": "warn",
+    "unlisted": "warn",
+    "exports": "warn",
+    "types": "warn",
+    "unresolved": "off",
+    "binaries": "off",
+    "nsExports": "off",
+    "nsTypes": "off",
+    "enumMembers": "off",
+    "duplicates": "off",
+  },
+}
